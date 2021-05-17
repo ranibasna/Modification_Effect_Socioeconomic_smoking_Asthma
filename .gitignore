@@ -1,0 +1,14 @@
+# Ignore these directories:
+data/
+_targets/
+renv/
+Intermediate/outputs
+Intermediate/Processed_data_CSV
+NotebooksAnalysis/
+R/boot_bn_lean_mice.R
+R/mice_imp_model.R
+R/Install_packages.R
+# ignore these files
+# Ignore temporary files:
+.DS_Store
+.Rproj.user

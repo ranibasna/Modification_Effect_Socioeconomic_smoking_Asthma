@@ -12,6 +12,7 @@ R/mice_imp_model.R
 R/Install_packages.R
 # ignore these files
 socioeconomics.Rproj
+Dockerfile_singularity
 # Ignore temporary files:
 .DS_Store
 .Rproj.user

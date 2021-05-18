@@ -74,111 +74,88 @@ ggplot(data_all_miss, aes(x = duration, y = BMI)) + geom_miss_point() + facet_wr
 
 
 
-# visualization after imputation
-
-```{r}
-#tar_load(density_plot)
-#density_plot
-```
-
-```{r}
-stripplot(loaded_mice_object, pch = 20, cex = 1.2)
-```
-
-```{r}
-df_1 <- data_all_miss %>% select(c(BMI, duration)) %>% rename(varduration_imp = duration) %>%
-  mutate(varduration_imp = as.logical(ifelse(is.na(varduration_imp),"TRUE","FALSE"))) %>% rownames_to_column()
-# SELECT A SPECIFIC SAMPLE
-imp_data <- complete(loaded_mice_object, 1)
-df_2 <- imp_data %>% select(duration, BMI) %>% rownames_to_column()
-df <- left_join(df_1,df_2)
-df <- as.data.frame(df)
-vars <- c("BMI","duration","varduration_imp")
-VIM::marginplot(df[,vars], delimiter="imp", alpha=0.6, pch=c(19))
-```
-
-
-```{r}
-df_1 <- data_all_miss %>% select(c(BMI, age)) %>% rename(BMI_imp = BMI) %>%
-  mutate(BMI_imp = as.logical(ifelse(is.na(BMI_imp),"TRUE","FALSE"))) %>% rownames_to_column()
-df_2 <- imp_data %>% select(age, BMI) %>% rownames_to_column()
-df <- left_join(df_1,df_2)
-
-df <- as.data.frame(df)
-vars <- c("age", "BMI","BMI_imp")
-marginplot(df[,vars], delimiter="imp", alpha=0.6, pch=c(19))
-```
-
-
-```{r}
-df_3 <- data_all_miss %>% select(c(duration, BMI)) %>% rename(BMI_imp = BMI, duration_imp = duration) %>% mutate(BMI_imp = as.logical(ifelse(is.na(BMI_imp),"TRUE","FALSE"))) %>% mutate(duration_imp = as.logical(ifelse(is.na(duration_imp),"TRUE","FALSE"))) %>% rownames_to_column()
-
-df_4 <- imp_data %>% select(duration, BMI) %>% rownames_to_column()
-df <- left_join(df_3,df_4)
-
-df <- as.data.frame(df)
-#vars <- c("BMI","duration","BMI_imp")
-vars <- c("BMI","duration","duration_imp")
-#vars <- c("duration","BMI","duration_imp")
-# imputting values in sleep dataset using knn
-histMiss(df[,vars], delimiter="imp", selection="any")
-```
-
-```{r}
-pbox(df[,vars], delimiter="imp", pch=c(19))
-pbox(df[,vars], delimiter="imp", selection = "none")
-pbox(df[,vars], delimiter="imp", selection = "all")
-```
-
-
-```{r}
-#cat_var <- sei_class
-df_1 <- data_all_miss %>% select(c(BMI, sei_class)) %>% rename(sei_class_imp = sei_class) %>%
-  mutate(sei_class_imp = as.logical(ifelse(is.na(sei_class_imp),"TRUE","FALSE"))) %>% rownames_to_column()
-
-df_2 <- imp_data %>% select(sei_class, BMI) %>% rownames_to_column()
-
-df <- left_join(df_1,df_2)
-df <- as.data.frame(df)
-vars <- c("BMI","sei_class","sei_class_imp")
-barMiss(df[,vars], delimiter = "_imp", selection = "any", only.miss = FALSE)
-##
-df_1 <- data_all_miss %>% select(c(BMI, syk_class)) %>% rename(syk_class_imp = syk_class) %>%
-  mutate(syk_class_imp = as.logical(ifelse(is.na(syk_class_imp),"TRUE","FALSE"))) %>% rownames_to_column()
-df_2 <- imp_data %>% select(syk_class, BMI) %>% rownames_to_column()
-df <- left_join(df_1,df_2)
-df <- as.data.frame(df)
-vars <- c("BMI","syk_class","syk_class_imp")
-barMiss(df[,vars], delimiter = "_imp", selection = "any", only.miss = FALSE)
-```
-
-
-```{r}
-# matrixplot(df[,vars], delimiter="_imp", sortby="gender")
-matrixplot(df[,vars], delimiter="_imp", sortby="syk_class")
-```
-
-
-<!-- ### mosaic plot for categorical variables -->
+<!-- # visualization after imputation -->
 
 <!-- ```{r} -->
-<!-- df_1 <- data_all_miss %>% select(c(gender, vars_status,e_amount,smoke_expwork, trt_bp, varwork, sei_class, ssk_class, education)) %>% rename(vars_status_imp = vars_status, sex_imp = sex, e_amount_imp = e_amount, smoke_expwork_imp = smoke_expwork, trt_bp_imp = trt_bp, varwork_imp = varwork, sei_class_imp = sei_class, ssk_class_imp = ssk_class, education_imp = education) %>%  -->
-<!--   mutate(vars_status_imp = as.logical(ifelse(is.na(vars_status_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(trt_bp_imp = as.logical(ifelse(is.na(trt_bp_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(varwork_imp = as.logical(ifelse(is.na(varwork_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(e_amount_imp = as.logical(ifelse(is.na(e_amount_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(sei_class_imp = as.logical(ifelse(is.na(sei_class_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(ssk_class_imp = as.logical(ifelse(is.na(ssk_class_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(education_imp = as.logical(ifelse(is.na(education_imp),"TRUE","FALSE"))) %>% -->
-<!--   mutate(sex_imp = as.logical(ifelse(is.na(sex_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+<!-- #tar_load(density_plot) -->
+<!-- #density_plot -->
+<!-- ``` -->
 
-<!-- df_2 <- imp_data %>% select(gender, vars_status,e_amount, smoke_expwork, trt_bp, varwork, trt_copd, sei_class, ssk_class, education) %>% rownames_to_column() -->
+<!-- ```{r} -->
+<!-- stripplot(loaded_mice_object, pch = 20, cex = 1.2) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- df_1 <- data_all_miss %>% select(c(BMI, duration)) %>% rename(varduration_imp = duration) %>% -->
+<!--   mutate(varduration_imp = as.logical(ifelse(is.na(varduration_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+<!-- # SELECT A SPECIFIC SAMPLE -->
+<!-- imp_data <- complete(loaded_mice_object, 1) -->
+<!-- df_2 <- imp_data %>% select(duration, BMI) %>% rownames_to_column() -->
+<!-- df <- left_join(df_1,df_2) -->
+<!-- df <- as.data.frame(df) -->
+<!-- vars <- c("BMI","duration","varduration_imp") -->
+<!-- VIM::marginplot(df[,vars], delimiter="imp", alpha=0.6, pch=c(19)) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- df_1 <- data_all_miss %>% select(c(BMI, age)) %>% rename(BMI_imp = BMI) %>% -->
+<!--   mutate(BMI_imp = as.logical(ifelse(is.na(BMI_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+<!-- df_2 <- imp_data %>% select(age, BMI) %>% rownames_to_column() -->
 <!-- df <- left_join(df_1,df_2) -->
 
 <!-- df <- as.data.frame(df) -->
-<!-- #vars <- c("BMI","varduration","vars_status_imp") -->
-<!-- vars <- c("e_amount","trt_copd","varwork","sex","vars_status", "ssk_class", "education", "trt_bp", "smoke_expwork","sei_class",  "sex_imp", "vars_status_imp","e_amount_imp","smoke_expwork_imp","trt_bp_imp","varwork_imp", "sei_class_imp", "ssk_class_imp", "education_imp") -->
-
-<!--  mosaicMiss(df[,vars], highlight=3, plotvars=5:7, delimiter="_imp", miss.labels=FALSE) -->
-<!--  mosaicMiss(df %>% select(c(sex_imp, sei_class_imp, education_imp, education, sei_class, sex)), highlight = 3, plotvars = 4:6, delimiter = "_imp", miss.labels = FALSE) -->
+<!-- vars <- c("age", "BMI","BMI_imp") -->
+<!-- marginplot(df[,vars], delimiter="imp", alpha=0.6, pch=c(19)) -->
 <!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- df_3 <- data_all_miss %>% select(c(duration, BMI)) %>% rename(BMI_imp = BMI, duration_imp = duration) %>% mutate(BMI_imp = as.logical(ifelse(is.na(BMI_imp),"TRUE","FALSE"))) %>% mutate(duration_imp = as.logical(ifelse(is.na(duration_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+
+<!-- df_4 <- imp_data %>% select(duration, BMI) %>% rownames_to_column() -->
+<!-- df <- left_join(df_3,df_4) -->
+
+<!-- df <- as.data.frame(df) -->
+<!-- #vars <- c("BMI","duration","BMI_imp") -->
+<!-- vars <- c("BMI","duration","duration_imp") -->
+<!-- #vars <- c("duration","BMI","duration_imp") -->
+<!-- # imputting values in sleep dataset using knn -->
+<!-- histMiss(df[,vars], delimiter="imp", selection="any") -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- pbox(df[,vars], delimiter="imp", pch=c(19)) -->
+<!-- pbox(df[,vars], delimiter="imp", selection = "none") -->
+<!-- pbox(df[,vars], delimiter="imp", selection = "all") -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- #cat_var <- sei_class -->
+<!-- df_1 <- data_all_miss %>% select(c(BMI, sei_class)) %>% rename(sei_class_imp = sei_class) %>% -->
+<!--   mutate(sei_class_imp = as.logical(ifelse(is.na(sei_class_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+
+<!-- df_2 <- imp_data %>% select(sei_class, BMI) %>% rownames_to_column() -->
+
+<!-- df <- left_join(df_1,df_2) -->
+<!-- df <- as.data.frame(df) -->
+<!-- vars <- c("BMI","sei_class","sei_class_imp") -->
+<!-- barMiss(df[,vars], delimiter = "_imp", selection = "any", only.miss = FALSE) -->
+<!-- ## -->
+<!-- df_1 <- data_all_miss %>% select(c(BMI, syk_class)) %>% rename(syk_class_imp = syk_class) %>% -->
+<!--   mutate(syk_class_imp = as.logical(ifelse(is.na(syk_class_imp),"TRUE","FALSE"))) %>% rownames_to_column() -->
+<!-- df_2 <- imp_data %>% select(syk_class, BMI) %>% rownames_to_column() -->
+<!-- df <- left_join(df_1,df_2) -->
+<!-- df <- as.data.frame(df) -->
+<!-- vars <- c("BMI","syk_class","syk_class_imp") -->
+<!-- barMiss(df[,vars], delimiter = "_imp", selection = "any", only.miss = FALSE) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- # matrixplot(df[,vars], delimiter="_imp", sortby="gender") -->
+<!-- matrixplot(df[,vars], delimiter="_imp", sortby="syk_class") -->
+<!-- ``` -->
+
+

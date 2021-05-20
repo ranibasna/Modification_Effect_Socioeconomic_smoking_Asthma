@@ -9,7 +9,7 @@ In order to set the environment for reproducing the results in a Docker environm
 - open the command line and run the following command
 - docker run -it --rm -v /path_to_your_local_project_directory:/socioeconomics ranibasna/smok_soci_miss_bn_sing_renv
 
-* If you want to use the rstudio and skip the docker environment follow the below steps, However, without the Docker iamge the results may change a bit and it will not produce a full reproducible workflow.
+## If you want to use the rstudio and skip the docker environment follow the below steps, However, without the Docker iamge the results may change a bit and it will not produce a full reproducible workflow.
 - Git clone this repository
 - Add a directory under the name data and upload the given data inside it.
 - Add a directory inside Intermediate under the name outputs and add the give r objects. Specifically, the mice and bn objects.

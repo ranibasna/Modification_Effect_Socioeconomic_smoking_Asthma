@@ -1,0 +1,46 @@
+# Base image https://hub.docker.com/u/rocker/
+# docker build -f Dockerfile_renv -t ranibasna/smok_soci_miss_bn_sing_renv .
+# docker image name is smok_soci_miss_bn_sing_renv
+# this is needed to construct a Docker image for the singularity image and the final docker image pushed to github
+
+FROM rocker/r-ver:latest
+
+LABEL description = "Image for Socio Economic Smoking Bayesian Network analysis Project that will be used to build a singularity image to use on the HPC"
+
+MAINTAINER "Rani Basna" ranibasna@yahoo.com
+
+## install debian packages for the bayesian sampling rjags
+RUN apt-get update && apt-get install --no-install-recommends --yes r-cran-rjags \
+    libicu-dev \
+    make \
+    libglpk-dev \
+    sudo \
+    pandoc \
+    libgmp3-dev \
+    libxml2-dev \
+    zlib1g-dev \
+    libjpeg-dev \
+    libpng-dev
+
+
+# install renv package
+RUN Rscript -e "install.packages('renv')"
+
+# copy everything to docker, including renv.lock file
+RUN mkdir /socioeconomics
+COPY renv.lock ./socioeconomics
+COPY renv ./socioeconomics
+
+#COPY . /socioeconomics
+# set working directory
+WORKDIR /socioeconomics
+
+#RUN mkdir data
+#RUN mkdir Intermediate/outputs
+
+# restore all the packages
+RUN Rscript -e "renv::restore()"
+
+# run R code
+CMD Rscript -e "targets::tar_make()"
+# CMD ["Rscript", "main.R"]

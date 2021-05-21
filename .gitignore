@@ -1,10 +1,10 @@
 # Ignore these directories:
 data/
 _targets/
-renv/library
-renv/local
-renv/settings.dcf
-renv/staging
+#renv/library
+#renv/local
+#renv/settings.dcf
+#renv/staging
 Intermediate/outputs
 Intermediate/Processed_data_CSV
 Intermediate/Reports/BN_Analysis.nb.html

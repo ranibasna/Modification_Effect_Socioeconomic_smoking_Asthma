@@ -9,6 +9,7 @@ Intermediate/outputs
 Intermediate/Processed_data_CSV
 Intermediate/Reports/BN_Analysis.nb.html
 Intermediate/Reports/miss_data_validation_report.html
+Presentation/dis_boot_hc.RData
 NotebooksAnalysis/
 R/boot_bn_lean_mice.R
 R/mice_imp_model.R
@@ -17,6 +18,7 @@ R/Install_packages.R
 # ignore these files
 #socioeconomics.Rproj
 Dockerfile_singularity
+
 
 # Ignore temporary files:
 .DS_Store

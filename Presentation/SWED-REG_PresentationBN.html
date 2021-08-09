@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>Bayesian Network for interaction between smoking social class and risk of asthma.</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="SWED-REG_PresentationBN_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+
+<link rel="stylesheet" href="SWED-REG_PresentationBN_files/reveal.js-3.3.0.1/css/theme/moon.css" id="theme">
+
+<style type="text/css">
+.reveal section img {
+  background: rgba(255, 255, 255, 0.85);
+}
+</style>
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="styles.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+    <link href="SWED-REG_PresentationBN_files/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+    <link href="SWED-REG_PresentationBN_files/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Bayesian Network for interaction between smoking social class and risk of asthma. <img data-src="GU.jpeg" style="width:1in" /></h1>
+    <h2 class="author"><div class="line-block">Rani Basna<br />
+Krefting Research Center, University of Gothenburg.</div></h2>
+    <h3 class="date">24/03/2021</h3>
+</section>
+
+<section><section id="introduction-to-bayesian-network" class="title-slide slide level1"><h1>Introduction to Bayesian Network</h1><p><img data-src="BNIntroduction.jpeg" /></p></section><section id="correlation-and-dependence" class="slide level2">
+<h2>Correlation and Dependence</h2>
+<ul>
+<li><p>Two random quantities can be uncorrelated but still be dependent but if they are independent they are necessarily uncorrelated.</p></li>
+<li><p>Set of correlated random variables is a subset of set of dependent random variables.</p></li>
+</ul>
+<p><img data-src="CorrelationVSDependence.webp" width="700" /></p>
+</section><section id="intorduction-to-bayesian-network" class="slide level2">
+<h2>Intorduction to Bayesian Network</h2>
+<p><img data-src="architecture.png" width="800" /></p>
+</section><section id="intorduction-to-bayesian-network-1" class="slide level2">
+<h2>Intorduction to Bayesian Network</h2>
+<ul>
+<li>A BNs is a directed acyclic graph in which each edge corresponds to a conditional dependency, and each node corresponds to a unique random variable.</li>
+<li>If an edge exists in the graph connecting random variables <span class="math inline"><em>A</em></span> and <span class="math inline"><em>B</em></span>, it means that <span class="math inline"><em>P</em>(<em>B</em>|<em>A</em>)</span> is a factor in the joint probability distribution, so we must know <span class="math inline"><em>P</em>(<em>B</em>|<em>A</em>)</span> for all values of B and A in order to conduct inference.</li>
+</ul>
+<!-- - Bayesian networks satisfy the local Markov property, which states that a node is conditionally independent of its non-descendants given its parents. -->
+<!-- ![](Rplot.png){height=700px, width=800px} -->
+</section><section id="reasons-to-use-bayesian-networks" class="slide level2">
+<h2>Reasons to use Bayesian Networks</h2>
+<ul>
+<li><p><small> Encode the association between all variables (interactive view).</small></p></li>
+<li><p><small> Encode the association as Conditional Independence structure of variables.</small></p></li>
+<li><p><small> Generative as opposed to regression as discriminative.</small></p></li>
+<li><p><small>Casual effect, intervention, Counterfactual and what-if scenario.</small></p></li>
+<li><p><small>Expert system, Hybrid learning, or learn completly from data.</small></p></li>
+<li><p><small>BN can be extended into decision models by incorporating decision and utility nodes to automate decisions.</small></p></li>
+<li><p><small>Multiple outcomes and exposures in one BN model.</small></p></li>
+<li><p><small>Avoiding the collider bias (feature selection.).</small></p></li>
+<li><p><small>probability distribution with inference.</small></p></li>
+</ul>
+</section><section id="steps-of-building-a-bayesian-network-analysis" class="slide level2">
+<h2>Steps of Building a Bayesian Network Analysis</h2>
+<ul>
+<li>Learning the Network structure:
+<ul>
+<li>Data_driven approach (Score-based approach, Constraint based approach)</li>
+<li>Expert knowledge approach</li>
+<li>Hybrid approach (using white and blacklist as constraint)</li>
+</ul></li>
+<li>Learning the parameter
+<ul>
+<li>Maximum likelihood estimation</li>
+<li>Bayesian Estimation</li>
+</ul></li>
+<li>Approximate Inference</li>
+</ul>
+<!-- ## Reasons to use Bayesian Networks and Graphical Models -->
+<!-- - <small>Encode the association between all variables (interactive view).</small> -->
+<!-- - Encode the association between all variables (interactive view). -->
+<!-- - Encode the association as Conditional Independence structure of variables.  -->
+<!-- - Generative as opposed to regression as discriminative. -->
+<!-- - Casual effect, intervention, Counterfactual and what-if scenario. -->
+<!-- - Expert system, Hybrid learning, or learn completly from data. -->
+<!-- - BN can be extended into decision models by incorporating decision and utility nodes to automate decisions.  -->
+<!-- ## Reasons to use Bayesian Networks and Graphical Models -->
+<!-- - Multiple outcomes and exposures in one BN model. -->
+<!-- - Avoiding the collider bias. -->
+<!-- - probability distribution with inference.  -->
+<!-- - BN as feature selection. -->
+</section></section>
+<section><section id="example-of-socioeconomic-airway-data" class="title-slide slide level1"><h1>Example of Socioeconomic Airway data</h1></section><section id="learning-the-network-structure" class="slide level2">
+<h2>Learning the Network Structure</h2>
+</section><section id="data-preprocessing" class="slide level2">
+<h2>Data Preprocessing</h2>
+<ul>
+<li>Missing value imputation</li>
+<li>Variable transformation</li>
+</ul>
+</section><section id="structure-learned-from-data-hill-climbing" class="slide level2">
+<h2>Structure learned from data (Hill-Climbing)</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/structureLearning-1.png" width="768" /></p>
+</section><section id="chalenges" class="slide level2">
+<h2>chalenges</h2>
+<ul>
+<li><p>Overfitting, Bayesian information Criteria</p></li>
+<li><p>Stability</p></li>
+<li><p>we can improve the quality of the structure learned from the data by averaging multiple DAGs</p></li>
+<li><p>One possible approach to that end is to apply bootstrap resampling.</p></li>
+</ul>
+</section><section id="comparing-tow-different-structure-learning" class="slide level2">
+<h2>Comparing tow different structure learning</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/structureLearning2-1.png" width="768" /></p>
+</section><section id="bootstap-resampling" class="slide level2">
+<h2>Bootstap resampling</h2>
+<ol type="1">
+<li>Repeat many times
+<ul>
+<li>sample a new data set from the original data using either parametric or nonparametric bootstrap;</li>
+<li>learn the structure of the graphical model for each sample data.</li>
+</ul></li>
+<li>Estimate the probability that each possible edge is present in the true network structure.</li>
+</ol>
+<ul>
+<li>This result in arc strength and arc direction.<br />
+</li>
+<li>Arcs are considered significant if they appear in at least 85% of the networks, and in the direction that appears most frequently.</li>
+</ul>
+</section><section id="averaging" class="slide level2">
+<h2>Averaging</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/bootstrap-1.png" width="768" /></p>
+</section><section id="cumulative-distribution-of-the-arcs-strength" class="slide level2">
+<h2>Cumulative Distribution of the arcs strength</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/arcsDistribution-1.png" title="Cumulative distribution function of the arc strength values computed with bootstrap resampling" alt="Cumulative distribution function of the arc strength values computed with bootstrap resampling" width="768" /></p>
+</section></section>
+<section><section id="learning-the-parameters-and-validations" class="title-slide slide level1"><h1>Learning the parameters and Validations</h1></section><section id="cross-validation" class="slide level2">
+<h2>Cross-validation</h2>
+<pre><code>## 
+##   k-fold cross-validation for Bayesian networks
+## 
+##   target network structure:
+##    [sei_class][jabstatus|sei_class][syk_class|sei_class]
+##    [gender|sei_class:syk_class][trt_bp|jabstatus][duration|jabstatus]
+##    [edu_credits|trt_bp:sei_class][smoking_status|duration][age|jabstatus:trt_bp]
+##    [trt_sleep|jabstatus:gender:trt_bp][s_amount|duration]
+##    [e_amount|smoking_status][trt_copd|trt_bp:trt_sleep:duration]
+##    [startage|smoking_status][hereditery_asthma|trt_copd]
+##    [trt_diabetes|gender:trt_bp:trt_copd:trt_sleep]
+##    [asthma_tm|hereditery_asthma:trt_copd]
+##    [hereditery_allergy|hereditery_asthma:asthma_tm]
+##    [any_smp|hereditery_allergy:smoking_status:trt_copd:asthma_tm]
+##    [herditery_pulldis|hereditery_asthma:any_smp:asthma_tm]
+##    [DGF_work|any_smp:gender:syk_class]
+##    [BMI|any_smp:gender:age:trt_bp:trt_diabetes]
+##    [c_asthma|hereditery_asthma:any_smp:asthma_tm]
+##    [only_symptoms|any_smp:asthma_tm][copd|any_smp:trt_copd]
+##    [w_asthma|any_smp:asthma_tm][smoke_expwork|DGF_work:s_amount]
+##    [her_dis|hereditery_asthma:herditery_pulldis]
+##    [noalle_asthma|hereditery_allergy:c_asthma]
+##    [alle_asthma|hereditery_allergy:c_asthma]
+##    [smoke_exphome|any_smp:smoke_expwork:s_amount]
+##   number of folds:                       10 
+##   loss function:                         
+##                                    Classification Error (Posterior, cond. Gauss.) 
+##   training node:                         c_asthma 
+##   number of runs:                        5 
+##   average loss over the runs:            0.001960492 
+##   standard deviation of the loss:        2.410982e-07</code></pre>
+</section><section id="checking-generated-data" class="slide level2">
+<h2>Checking generated data</h2>
+</section><section id="original-vs-simulated-1" class="slide level2">
+<h2>Original vs Simulated 1</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/OrVsSim1-1.png" width="768" /></p>
+</section><section id="original-vs-simulated-2" class="slide level2">
+<h2>Original vs Simulated 2</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/OrVsSim2-1.png" width="768" /></p>
+<!-- ## Original vs Simulated 3 -->
+<!-- ```{r OrVsSim3, echo=FALSE, cache=TRUE} -->
+<!-- plot_grid(gg_list[[13]], gg_list[[14]], gg_list[[15]], gg_list[[16]],gg_list[[17]],gg_list[[18]], nrow = 2, ncol = 3) -->
+<!-- ``` -->
+</section><section id="original-vs-simulated-3" class="slide level2">
+<h2>Original vs Simulated 3</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/OrVsSim4-1.png" width="768" /></p>
+</section></section>
+<section><section id="inference" class="title-slide slide level1"><h1>Inference</h1></section><section id="sampling-the-condtional-probability-allergic-asthma" class="slide level2">
+<h2>Sampling the Condtional Probability Allergic Asthma</h2>
+<ul>
+<li><span class="math inline"><em>P</em>[alergic asthma|NonSmoker, age ∈ [44, 63], No treatment diabete, No dust and Gas Exposure, No Hereditary lung disease]</span></li>
+<li>We will sample the conditional probability <span class="math inline">1000</span> times</li>
+</ul>
+</section><section id="ploting-the-results" class="slide level2">
+<h2>Ploting the results</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/PlotDI-1.png" width="768" /></p>
+</section><section id="sampling-the-condtional-probability-asthma" class="slide level2">
+<h2>Sampling the Condtional Probability Asthma</h2>
+<ul>
+<li><span class="math inline"><em>P</em>[Asthma|NonSmoker, age ∈ [44, 63], No treatment diabete, No dust and Gas Exposure, No Hereditary lung disease, 2 years high school]</span></li>
+<li>We will sample the conditional probability <span class="math inline">1000</span> times</li>
+</ul>
+</section><section id="ploting-the-result" class="slide level2">
+<h2>Ploting the result</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/CPInference2-1.png" width="768" /></p>
+</section><section id="sampling-the-condtional-probability-asthma-and-gender" class="slide level2">
+<h2>Sampling the Condtional Probability Asthma and gender</h2>
+<ul>
+<li><span class="math inline"><em>P</em>[ Asthma and being Male|Smoker, age ∈ [44, 63], No treatment diabete, No dust and Gas Exposure, No Hereditary lung disease, 2 years high school]</span></li>
+<li>Again, we will sample the conditional probability <span class="math inline">1000</span> times</li>
+</ul>
+</section><section id="plotting-the-resuts" class="slide level2">
+<h2>Plotting the resuts</h2>
+<p><img src="SWED-REG_PresentationBN_files/figure-revealjs/unnamed-chunk-1-1.png" width="768" /></p>
+</section></section>
+<section id="thank-you-for-your-attention" class="title-slide slide level1"><h1>Thank you for your attention</h1></section>
+    </div>
+  </div>
+
+  <script src="SWED-REG_PresentationBN_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="SWED-REG_PresentationBN_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: true,
+        // Transition style
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+
+        menu: {
+          numbers: true,
+          custom: false,
+          themes: false,
+          transitions: false
+        },
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'SWED-REG_PresentationBN_files/reveal.js-3.3.0.1/plugin/menu/menu.js', async: true },
+        ]
+      });
+    </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

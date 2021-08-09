@@ -126,79 +126,116 @@ visNetwork(nodes, edges, width = "100%",height = "900px") %>%
 ```
 
 
-# Validating the Bayesian Network {.tabset}
+<!-- # Validating the Bayesian Network {.tabset} -->
 
-```{r discretizeaVars, echo=FALSE, eval=FALSE}
-dis_data <- bnlearn::discretize(data = data_modeling %>% select(duration, startage), method = "hartemink", breaks = 7, ordered = FALSE, ibreaks=60, idisc="quantile")
-data_modeling <- data_modeling %>% dplyr::select(-c( duration, startage)) %>% cbind(dis_data) 
-#fitted.simpler_mice_hc_dis_2 = bn.fit(cextend(avg.simpler_mice_hc), data_modeling)
+<!-- ```{r discretizeaVars, echo=FALSE, eval=FALSE} -->
+<!-- dis_data <- bnlearn::discretize(data = data_modeling %>% select(duration, startage), method = "hartemink", breaks = 7, ordered = FALSE, ibreaks=60, idisc="quantile") -->
+<!-- data_modeling <- data_modeling %>% dplyr::select(-c( duration, startage)) %>% cbind(dis_data)  -->
+<!-- #fitted.simpler_mice_hc_dis_2 = bn.fit(cextend(avg.simpler_mice_hc), data_modeling) -->
+<!-- ``` -->
+
+<!-- ## Cross_validation -->
+
+<!-- ```{r CrossValidation, warning=FALSE, message=FALSE} -->
+<!-- tar_load(cv.bn_hc) -->
+<!-- cv.bn_hc -->
+<!-- ``` -->
+
+
+<!-- ```{r simulation, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE} -->
+<!-- # fit the BN -->
+<!-- fitted.simpler_mice_hc = bn.fit(cextend(avg.simpler_mice_hc), data_modeling) -->
+
+<!-- ais_sub = data_modeling -->
+
+<!-- # compare the synthetic and original data frames -->
+<!-- df <- ais_sub %>%  -->
+<!--   mutate(type = "orig") %>%  -->
+<!--   bind_rows( -->
+<!--     rbn(fitted.simpler_mice_hc, 30000) %>%  -->
+<!--       mutate(type = "sim") -->
+<!--     ) # %>%  -->
+<!-- gg_list <- list() -->
+<!-- grp_var <- "type" -->
+<!-- vars <- colnames(df)[colnames(df) != grp_var] -->
+<!-- for(k in 1:length(vars)){ -->
+<!--   var_k <- vars[k] -->
+<!--   gg_list[[k]] <- ggplot(df, aes_string(x = var_k, fill = grp_var, col = grp_var)) -->
+<!--   if(is.numeric(df[[var_k]])){ -->
+<!--     gg_list[[k]] <- gg_list[[k]] + geom_density(alpha = 0.85, size = 0) -->
+<!--   }else{ -->
+<!--     gg_list[[k]] <- gg_list[[k]] + geom_bar(position = "dodge") -->
+<!--   } -->
+<!--   gg_list[[k]] <- gg_list[[k]] +  -->
+<!--     theme( -->
+<!--       axis.text.x = element_text(angle = 90), -->
+<!--       axis.title.x = element_blank() -->
+<!--     ) + -->
+<!--     labs(title = var_k) -->
+<!-- } -->
+
+<!-- ``` -->
+
+<!-- ```{r, figures-side, fig.show="hold", out.width="50%", eval=FALSE, echo=FALSE} -->
+<!-- length(gg_list) -->
+<!-- gg_list -->
+<!-- ``` -->
+
+<!-- ## Original vs Simulated 1 -->
+
+<!-- ```{r OrVsSim1, echo=FALSE, cache=TRUE} -->
+<!-- plot_grid(gg_list[[1]], gg_list[[2]], gg_list[[3]], gg_list[[4]], gg_list[[5]], gg_list[[6]], nrow = 2, ncol = 3) -->
+<!-- ``` -->
+
+<!-- ## Original vs Simulated 2 -->
+
+<!-- ```{r OrVsSim2, echo=FALSE, cache=TRUE} -->
+<!-- plot_grid(gg_list[[7]], gg_list[[8]], gg_list[[9]], gg_list[[10]], gg_list[[11]], gg_list[[12]], nrow = 2, ncol = 3) -->
+<!-- ``` -->
+
+
+<!-- ## Original vs Simulated 3 -->
+
+<!-- ```{r OrVsSim4, echo=FALSE, warning=FALSE, message=FALSE, cache=TRUE} -->
+<!-- plot_grid(gg_list[[19]], gg_list[[20]], gg_list[[21]], gg_list[[22]],gg_list[[23]],gg_list[[24]], nrow = 2, ncol = 3) -->
+<!-- ``` -->
+
+# Conditional Probability Distributions for effect modification of smoking var {.tabset}
+
+## c_asthma with smoking_1
+```{r}
+effe_modif_vars_smoking_only <-  colnames(data_modeling %>% select(smoking_status))
+
+prop_smoking_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_smoking_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
+
+# get plot
+
+prop_smoking_only_p <- get_cpq_plot_one_var(res_data = prop_smoking_only, effe_modif_vars = effe_modif_vars_smoking_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
+
+prop_smoking_only_p[[2]]
+
+
 ```
 
-## Cross_validation
-
-```{r CrossValidation, warning=FALSE, message=FALSE}
-tar_load(cv.bn_hc)
-cv.bn_hc
+## table
+```{r}
+prop_smoking_only_p[[1]]
 ```
 
 
-```{r simulation, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
-# fit the BN
-fitted.simpler_mice_hc = bn.fit(cextend(avg.simpler_mice_hc), data_modeling)
+## c_asthma with smoking 
 
-ais_sub = data_modeling
+```{r cpquery_table_smoking_only, cache=TRUE, fig.height=8, fig.width=12}
+effe_modif_vars_smoking_only <-  colnames(data_modeling %>% select(smoking_status))
 
-# compare the synthetic and original data frames
-df <- ais_sub %>% 
-  mutate(type = "orig") %>% 
-  bind_rows(
-    rbn(fitted.simpler_mice_hc, 30000) %>% 
-      mutate(type = "sim")
-    ) # %>% 
-gg_list <- list()
-grp_var <- "type"
-vars <- colnames(df)[colnames(df) != grp_var]
-for(k in 1:length(vars)){
-  var_k <- vars[k]
-  gg_list[[k]] <- ggplot(df, aes_string(x = var_k, fill = grp_var, col = grp_var))
-  if(is.numeric(df[[var_k]])){
-    gg_list[[k]] <- gg_list[[k]] + geom_density(alpha = 0.85, size = 0)
-  }else{
-    gg_list[[k]] <- gg_list[[k]] + geom_bar(position = "dodge")
-  }
-  gg_list[[k]] <- gg_list[[k]] + 
-    theme(
-      axis.text.x = element_text(angle = 90),
-      axis.title.x = element_blank()
-    ) +
-    labs(title = var_k)
-}
+prop_smoking_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_smoking_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
 
+# get plot
+prop_smoking_only_p <- get_cpq_plot_one_var(res_data = prop_smoking_only, effe_modif_vars = effe_modif_vars_smoking_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
+
+prop_smoking_only_p[[2]]
 ```
 
-```{r, figures-side, fig.show="hold", out.width="50%", eval=FALSE, echo=FALSE}
-length(gg_list)
-gg_list
-```
-
-## Original vs Simulated 1
-
-```{r OrVsSim1, echo=FALSE, cache=TRUE}
-plot_grid(gg_list[[1]], gg_list[[2]], gg_list[[3]], gg_list[[4]], gg_list[[5]], gg_list[[6]], nrow = 2, ncol = 3)
-```
-
-## Original vs Simulated 2
-
-```{r OrVsSim2, echo=FALSE, cache=TRUE}
-plot_grid(gg_list[[7]], gg_list[[8]], gg_list[[9]], gg_list[[10]], gg_list[[11]], gg_list[[12]], nrow = 2, ncol = 3)
-```
-
-
-## Original vs Simulated 3
-
-```{r OrVsSim4, echo=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
-plot_grid(gg_list[[19]], gg_list[[20]], gg_list[[21]], gg_list[[22]],gg_list[[23]],gg_list[[24]], nrow = 2, ncol = 3)
-```
 
 <!-- ### condtional probabilities plots -->
 <!-- ```{r edu_only, cache=TRUE, fig.height=8, fig.width=12} -->
@@ -211,305 +248,305 @@ plot_grid(gg_list[[19]], gg_list[[20]], gg_list[[21]], gg_list[[22]],gg_list[[23
 <!-- ``` -->
 
 
-# Conditional Probability Distributions for effect modification of education var {.tabset}
-
-## c_asthma with education 
-```{r cpquery_table_edu_only, cache=TRUE, fig.height=8, fig.width=12}
-effe_modif_vars_edu_only <- colnames(data_modeling %>% select(education)) 
-# get the cp
-prop_edu_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_only_p <- get_cpq_plot_one_var(res_data = prop_edu_only, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_only_p[[2]]
-```
-
-## w_asthma with education 
-```{r cpquery_table_edu_only_w, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_edu_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_only_w_p <- get_cpq_plot_one_var(res_data = prop_edu_only_w, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_only_w_p[[2]]
-```
-
-## any_smp with education 
-```{r cpquery_table_edu_only_as, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_edu_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_only_as_p <- get_cpq_plot_one_var(res_data = prop_edu_only_as, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_only_as_p[[2]]
-```
-
-## alle_asthma with education 
-```{r cpquery_table_edu_only_aas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_edu_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_only_aas_p <- get_cpq_plot_one_var(res_data = prop_edu_only_aas, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_only_aas_p[[2]]
-```
-
-## noalle_asthma with education 
-```{r cpquery_table_edu_only_naas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_edu_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_only_naas_p <- get_cpq_plot_one_var(res_data = prop_edu_only_naas, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_only_naas_p[[2]]
-```
-
-# Conditional Probability Distributions for effect modification of sei_class var {.tabset}
-
-## c_asthma with sei_class 
-```{r cpquery_table_sei_only, cache=TRUE, fig.height=8, fig.width=12}
-effe_modif_vars_sei_only <- colnames(data_modeling %>% select(sei_class)) 
-# get the cp
-prop_sei_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_only_p <- get_cpq_plot_one_var(res_data = prop_sei_only, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_only_p[[2]]
-```
-
-## w_asthma with sei_class 
-```{r cpquery_table_sei_only_w, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_sel_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_only_w_p <- get_cpq_plot_one_var(res_data = prop_sel_only_w, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_only_w_p[[2]]
-```
-
-## any_smp with sei_class 
-```{r cpquery_table_sei_only_as, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_sei_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_only_as_p <- get_cpq_plot_one_var(res_data = prop_sei_only_as, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_only_as_p[[2]]
-```
-
-## alle_asthma with sei_class 
-```{r cpquery_table_sei_only_aas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_sei_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_only_aas_p <- get_cpq_plot_one_var(res_data = prop_sei_only_aas, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_only_aas_p[[2]]
-```
-
-## noalle_asthma with sei_class 
-```{r cpquery_table_sei_only_naas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_sei_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_only_naas_p <- get_cpq_plot_one_var(res_data = prop_sei_only_naas, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_only_naas_p[[2]]
-```
-
-# Conditional Probability Distributions for effect modification of syk_class var {.tabset}
-
-## c_asthma with syk_class 
-```{r cpquery_table_syk_only, cache=TRUE, fig.height=8, fig.width=12}
-effe_modif_vars_syk_only <- colnames(data_modeling %>% select(syk_class)) 
-# get the cp
-prop_syk_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_only_p <- get_cpq_plot_one_var(res_data = prop_syk_only, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
+<!-- # Conditional Probability Distributions for effect modification of education var {.tabset} -->
+
+<!-- ## c_asthma with education  -->
+<!-- ```{r cpquery_table_edu_only, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- effe_modif_vars_edu_only <- colnames(data_modeling %>% select(education))  -->
+<!-- # get the cp -->
+<!-- prop_edu_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_only_p <- get_cpq_plot_one_var(res_data = prop_edu_only, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_only_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with education  -->
+<!-- ```{r cpquery_table_edu_only_w, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_edu_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_only_w_p <- get_cpq_plot_one_var(res_data = prop_edu_only_w, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_only_w_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## any_smp with education  -->
+<!-- ```{r cpquery_table_edu_only_as, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_edu_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_only_as_p <- get_cpq_plot_one_var(res_data = prop_edu_only_as, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_only_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with education  -->
+<!-- ```{r cpquery_table_edu_only_aas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_edu_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_only_aas_p <- get_cpq_plot_one_var(res_data = prop_edu_only_aas, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_only_aas_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## noalle_asthma with education  -->
+<!-- ```{r cpquery_table_edu_only_naas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_edu_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_only_naas_p <- get_cpq_plot_one_var(res_data = prop_edu_only_naas, effe_modif_vars = effe_modif_vars_edu_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_only_naas_p[[2]] -->
+<!-- ``` -->
+
+<!-- # Conditional Probability Distributions for effect modification of sei_class var {.tabset} -->
+
+<!-- ## c_asthma with sei_class  -->
+<!-- ```{r cpquery_table_sei_only, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- effe_modif_vars_sei_only <- colnames(data_modeling %>% select(sei_class))  -->
+<!-- # get the cp -->
+<!-- prop_sei_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_only_p <- get_cpq_plot_one_var(res_data = prop_sei_only, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_only_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with sei_class  -->
+<!-- ```{r cpquery_table_sei_only_w, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_sel_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_only_w_p <- get_cpq_plot_one_var(res_data = prop_sel_only_w, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_only_w_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## any_smp with sei_class  -->
+<!-- ```{r cpquery_table_sei_only_as, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_sei_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_only_as_p <- get_cpq_plot_one_var(res_data = prop_sei_only_as, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_only_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with sei_class  -->
+<!-- ```{r cpquery_table_sei_only_aas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_sei_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_only_aas_p <- get_cpq_plot_one_var(res_data = prop_sei_only_aas, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_only_aas_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## noalle_asthma with sei_class  -->
+<!-- ```{r cpquery_table_sei_only_naas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_sei_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_only_naas_p <- get_cpq_plot_one_var(res_data = prop_sei_only_naas, effe_modif_vars = effe_modif_vars_sei_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_only_naas_p[[2]] -->
+<!-- ``` -->
+
+<!-- # Conditional Probability Distributions for effect modification of syk_class var {.tabset} -->
+
+<!-- ## c_asthma with syk_class  -->
+<!-- ```{r cpquery_table_syk_only, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- effe_modif_vars_syk_only <- colnames(data_modeling %>% select(syk_class))  -->
+<!-- # get the cp -->
+<!-- prop_syk_only <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_only_p <- get_cpq_plot_one_var(res_data = prop_syk_only, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
 
-prop_syk_only_p[[2]]
-```
-
-## w_asthma with syk_class 
-```{r cpquery_table_syk_only_w, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_syk_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_only_w_p <- get_cpq_plot_one_var(res_data = prop_syk_only_w, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_syk_only_w_p[[2]]
-```
+<!-- prop_syk_only_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with syk_class  -->
+<!-- ```{r cpquery_table_syk_only_w, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_syk_only_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_only_w_p <- get_cpq_plot_one_var(res_data = prop_syk_only_w, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_syk_only_w_p[[2]] -->
+<!-- ``` -->
 
-## any_smp with syk_class 
-```{r cpquery_table_syk_only_as, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_syk_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_only_as_p <- get_cpq_plot_one_var(res_data = prop_syk_only_as, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_syk_only_as_p[[2]]
-```
-
-## alle_asthma with syk_class 
-```{r cpquery_table_syk_only_aas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_syk_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_only_aas_p <- get_cpq_plot_one_var(res_data = prop_syk_only_aas, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_syk_only_aas_p[[2]]
-```
-
-## noalle_asthma with syk_class 
-```{r cpquery_table_syk_only_naas, cache=TRUE, fig.height=8, fig.width=12}
-# get the cp
-prop_syk_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_only_naas_p <- get_cpq_plot_one_var(res_data = prop_syk_only_naas, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_syk_only_naas_p[[2]]
-```
-
-# Conditional Probability Distributions for effect modification of sei_class var with smoking {.tabset}
-
-## c_asthma with sei_class and smoking_status 
-```{r cpquery_table_w, cache=TRUE}
-effe_modif_vars_sei <- colnames(data_modeling %>% select(sei_class, smoking_status)) 
-
-# get the cp
-prop_sei <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_p <- get_cpq_plot(res_data = prop_sei, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_p[[2]]
-```
-
-## w_asthma with sei_class and smoking_status 
-```{r cpquery_table, cache=TRUE}
-# get the cp
-prop_sei_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_sei_w_p <- get_cpq_plot(res_data = prop_sei_w, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_w_p[[2]]
-```
-
-## any_smp with sei_class and smoking_status 
-```{r cpquerytableAny_smp, cache=TRUE}
-prop_sei_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-
-# get the plot
-prop_sei_as_p <- get_cpq_plot(res_data = prop_sei_as, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_as_p[[2]]
-```
-
-## alle_asthma with sei_class and smoking_status 
-```{r cpquerytableAny_allergyasthma, cache=TRUE}
-prop_sei_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-
-# get the plot
-prop_sei_aas_p <- get_cpq_plot(res_data = prop_sei_aas, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_aas_p[[2]]
-```
-
-## noalle_asthma with sei_class and smoking_status 
-```{r cpquerytableAnyNoalleAsthma, cache=TRUE, fig.height=8, fig.width=12}
-prop_sei_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-
-# get the plot
-prop_sei_naas_p <- get_cpq_plot(res_data = prop_sei_naas, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_sei_naas_p[[2]]
-```
-
-# Conditional Probability Distributions for effect modification of education var with smoking {.tabset}
-
-## c_asthma with education and smoking_status 
-```{r cpquery_table_edu, cache=TRUE, fig.height=8, fig.width=12}
-effe_modif_vars_edu <- colnames(data_modeling %>% select(education, smoking_status)) 
-# get the cp
-prop_edu <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_p <- get_cpq_plot(res_data = prop_edu, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_edu_p[[2]]
-```
-
-## w_asthma with education and smoking_status
-
-```{r cpquery_table_edu_w, cache=TRUE, fig.height=8, fig.width=12}
-prop_edu_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_edu_w_p <- get_cpq_plot(res_data = prop_edu_w, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_edu_w_p[[2]]
-```
-
-## any_smp with education and smoking_status
-```{r cpquerytableAny_smp_edu, cache=TRUE, fig.height=8, fig.width=12}
-prop_edu_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_as_p <- get_cpq_plot(res_data = prop_edu_as, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_syk_as_p[[2]]
-```
-
-## alle_asthma with education and smoking_status
-```{r cpquerytableAny_allergyasthma_edu, cache=TRUE, fig.height=8, fig.width=12}
-prop_edu_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-prop_edu_aas_p <- get_cpq_plot(res_data = prop_edu_aas, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_edu_aas_p[[2]]
-```
-
-
-## noalle_asthma with education and smoking_status
-```{r cpquerytableAnyNoalleAsthma_edu, cache=TRUE, fig.height=8, fig.width=12}
-prop_edu_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-prop_edu_naas_p <- get_cpq_plot(res_data = prop_edu_naas, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_edu_naas_p[[2]]
-```
-
-# Conditional Probability Distributions for effect modification of syk_class var with smoking {.tabset}
-
-## c_asthma with syk_class and smoking_status 
-```{r cpquery_table_syk, cache=TRUE, fig.height=8, fig.width=12}
-effe_modif_vars_syk <- colnames(data_modeling %>% select(syk_class, smoking_status)) 
-# get the cp
-prop_syk <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_p <- get_cpq_plot(res_data = prop_syk, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-
-prop_syk_p[[2]]
-```
-
-## w_asthma with syk_class and smoking_status
-
-```{r cpquery_table_syk_w, cache=TRUE, fig.height=8, fig.width=12}
-prop_syk_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_w_p <- get_cpq_plot(res_data = prop_syk_w, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_syk_w_p[[2]]
-```
-
-## any_smp with syk_class and smoking_status
-```{r cpquerytableAny_smp_syk, cache=TRUE, fig.height=8, fig.width=12}
-prop_syk_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-# get the plot
-prop_syk_as_p <- get_cpq_plot(res_data = prop_syk_as, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_syk_as_p[[2]]
-```
-
-## alle_asthma with syk_class and smoking_status
-```{r cpquerytableAny_allergyasthma_syk, cache=TRUE, fig.height=8, fig.width=12}
-prop_syk_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-prop_syk_aas_p <- get_cpq_plot(res_data = prop_syk_aas, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_syk_aas_p[[2]]
-```
-
-
-## noalle_asthma with syk_class and smoking_status
-```{r cpquerytableAnyNoalleAsthma_syk, cache=TRUE, fig.height=8, fig.width=12}
-prop_syk_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000)
-prop_syk_naas_p <- get_cpq_plot(res_data = prop_syk_naas, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling)
-prop_syk_naas_p[[2]]
-```
+<!-- ## any_smp with syk_class  -->
+<!-- ```{r cpquery_table_syk_only_as, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_syk_only_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_only_as_p <- get_cpq_plot_one_var(res_data = prop_syk_only_as, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_syk_only_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with syk_class  -->
+<!-- ```{r cpquery_table_syk_only_aas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_syk_only_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_only_aas_p <- get_cpq_plot_one_var(res_data = prop_syk_only_aas, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_syk_only_aas_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## noalle_asthma with syk_class  -->
+<!-- ```{r cpquery_table_syk_only_naas, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- # get the cp -->
+<!-- prop_syk_only_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk_only, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_only_naas_p <- get_cpq_plot_one_var(res_data = prop_syk_only_naas, effe_modif_vars = effe_modif_vars_syk_only, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_syk_only_naas_p[[2]] -->
+<!-- ``` -->
+
+<!-- # Conditional Probability Distributions for effect modification of sei_class var with smoking {.tabset} -->
+
+<!-- ## c_asthma with sei_class and smoking_status  -->
+<!-- ```{r cpquery_table_w, cache=TRUE} -->
+<!-- effe_modif_vars_sei <- colnames(data_modeling %>% select(sei_class, smoking_status))  -->
+
+<!-- # get the cp -->
+<!-- prop_sei <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_p <- get_cpq_plot(res_data = prop_sei, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with sei_class and smoking_status  -->
+<!-- ```{r cpquery_table, cache=TRUE} -->
+<!-- # get the cp -->
+<!-- prop_sei_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_sei_w_p <- get_cpq_plot(res_data = prop_sei_w, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_w_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## any_smp with sei_class and smoking_status  -->
+<!-- ```{r cpquerytableAny_smp, cache=TRUE} -->
+<!-- prop_sei_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+
+<!-- # get the plot -->
+<!-- prop_sei_as_p <- get_cpq_plot(res_data = prop_sei_as, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with sei_class and smoking_status  -->
+<!-- ```{r cpquerytableAny_allergyasthma, cache=TRUE} -->
+<!-- prop_sei_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+
+<!-- # get the plot -->
+<!-- prop_sei_aas_p <- get_cpq_plot(res_data = prop_sei_aas, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_aas_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## noalle_asthma with sei_class and smoking_status  -->
+<!-- ```{r cpquerytableAnyNoalleAsthma, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_sei_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_sei, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+
+<!-- # get the plot -->
+<!-- prop_sei_naas_p <- get_cpq_plot(res_data = prop_sei_naas, effe_modif_vars = effe_modif_vars_sei, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_sei_naas_p[[2]] -->
+<!-- ``` -->
+
+<!-- # Conditional Probability Distributions for effect modification of education var with smoking {.tabset} -->
+
+<!-- ## c_asthma with education and smoking_status  -->
+<!-- ```{r cpquery_table_edu, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- effe_modif_vars_edu <- colnames(data_modeling %>% select(education, smoking_status))  -->
+<!-- # get the cp -->
+<!-- prop_edu <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_p <- get_cpq_plot(res_data = prop_edu, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_edu_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with education and smoking_status -->
+
+<!-- ```{r cpquery_table_edu_w, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_edu_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_edu_w_p <- get_cpq_plot(res_data = prop_edu_w, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_edu_w_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## any_smp with education and smoking_status -->
+<!-- ```{r cpquerytableAny_smp_edu, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_edu_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_as_p <- get_cpq_plot(res_data = prop_edu_as, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_syk_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with education and smoking_status -->
+<!-- ```{r cpquerytableAny_allergyasthma_edu, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_edu_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- prop_edu_aas_p <- get_cpq_plot(res_data = prop_edu_aas, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_edu_aas_p[[2]] -->
+<!-- ``` -->
+
+
+<!-- ## noalle_asthma with education and smoking_status -->
+<!-- ```{r cpquerytableAnyNoalleAsthma_edu, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_edu_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_edu, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- prop_edu_naas_p <- get_cpq_plot(res_data = prop_edu_naas, effe_modif_vars = effe_modif_vars_edu, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_edu_naas_p[[2]] -->
+<!-- ``` -->
+
+<!-- # Conditional Probability Distributions for effect modification of syk_class var with smoking {.tabset} -->
+
+<!-- ## c_asthma with syk_class and smoking_status  -->
+<!-- ```{r cpquery_table_syk, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- effe_modif_vars_syk <- colnames(data_modeling %>% select(syk_class, smoking_status))  -->
+<!-- # get the cp -->
+<!-- prop_syk <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "c_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_p <- get_cpq_plot(res_data = prop_syk, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+
+<!-- prop_syk_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## w_asthma with syk_class and smoking_status -->
+
+<!-- ```{r cpquery_table_syk_w, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_syk_w <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "w_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_w_p <- get_cpq_plot(res_data = prop_syk_w, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_syk_w_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## any_smp with syk_class and smoking_status -->
+<!-- ```{r cpquerytableAny_smp_syk, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_syk_as <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "any_smp", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- # get the plot -->
+<!-- prop_syk_as_p <- get_cpq_plot(res_data = prop_syk_as, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_syk_as_p[[2]] -->
+<!-- ``` -->
+
+<!-- ## alle_asthma with syk_class and smoking_status -->
+<!-- ```{r cpquerytableAny_allergyasthma_syk, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_syk_aas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "alle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- prop_syk_aas_p <- get_cpq_plot(res_data = prop_syk_aas, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_syk_aas_p[[2]] -->
+<!-- ``` -->
+
+
+<!-- ## noalle_asthma with syk_class and smoking_status -->
+<!-- ```{r cpquerytableAnyNoalleAsthma_syk, cache=TRUE, fig.height=8, fig.width=12} -->
+<!-- prop_syk_naas <- cpq_effe_modif(.data = data_modeling, vars = effe_modif_vars_syk, outcome = "noalle_asthma", state = "1", model = avg.simpler_mice_hc, repeats = 200000) -->
+<!-- prop_syk_naas_p <- get_cpq_plot(res_data = prop_syk_naas, effe_modif_vars = effe_modif_vars_syk, original_raw_data = as.data.frame(raw_data), final_data = data_modeling) -->
+<!-- prop_syk_naas_p[[2]] -->
+<!-- ``` -->

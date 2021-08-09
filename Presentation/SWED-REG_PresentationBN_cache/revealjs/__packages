@@ -1,0 +1,12 @@
+base
+revealjs
+visNetwork
+dplyr
+bnlearn
+haven
+ggplot2
+BiocGenerics
+graph
+Rgraphviz
+cowplot
+qgraph
